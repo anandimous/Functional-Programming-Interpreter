@@ -1,4 +1,4 @@
-#create list of all chars, remove char from list if encountered in the input string
+#    create list of all chars, remove char from list if encountered in the input string
 #    check if list of chars is empty, if yes, print true, else false
 import string;
 
