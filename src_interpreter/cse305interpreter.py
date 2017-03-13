@@ -1,5 +1,13 @@
 import string;
 
+def is_digit(n):
+    try:
+        int(n)
+        return True
+    except ValueError:
+        return  False
+
+
 def interpreter(infil, outfil):
     fin = open(infil, 'r');
     fout = open(outfil, 'w');
@@ -14,37 +22,57 @@ def numbers_to_strings(argument):
     return switcher.get(argument, "nothing")
 '''
 
-    stack = [];
+    global stack = [];
+    global length = len(stack);
 
     for line in fin:
         command = line.split(' ')[0];
+        num = line.split(' ')[1];
 
         if command == 'push':
-            stack.append(line.split(' ')[1]);
+            if is_digit(num):
+                stack.append(num);
+            elif '"' in num:
+                stack.append(num[1:len(num)-1]);
+            elif num.isalphanum():
+                stack.append(num);
+            else:
+                stack.append(':error:');
         elif command == 'pop':
-            stack.pop(); #add verification test cases
+            if length!=0:
+                stack.pop();
+            else:
+                stack.append(':error');
         elif command == ':true:':
-            stack.append(":true:");
+            stack.append(':true:');
         elif command == ':false:':
-            stack.append(":false:");
+            stack.append(':false:');
         elif command == ':error:':
-            stack.append(":error:");
+            stack.append(':error:');
         elif command == 'add':
-            addn(stack.pop(),stack.pop());
+            if length!=0 and length!=1 and stack[length-1].isdigit() and stack[length-2].isdigit():
+                stack.append(int(stack.pop()) + int(stack.pop()));
+            else:
+                stack.append(':error:');
         elif command == 'sub':
-            subs(stack.pop(),stack.pop());
-        elif command == 'mul':
-            mult(stack.pop(),stack.pop());
-        elif command == 'div':
-            divs(stack.pop(),stack.pop());
-        elif command == 'rem':
-            remn(stack.pop(),stack.pop());
-        elif command == 'neg':
-            negv(stack.pop(),stack.pop());
-        elif command == 'swap':
-            swappy();
+            if length!=0 and length!=1 and stack[length-1].isdigit() and stack[length-2].isdigit():
+                stack.append(-int(stack.pop()) + int(stack.pop()));
+            else:
+                stack.append(':error:');
+        #elif command == 'mul':
+        #    mult(stack.pop(),stack.pop());
+        #elif command == 'div':
+        #    divs(stack.pop(),stack.pop());
+        #elif command == 'rem':
+        #    remn(stack.pop(),stack.pop());
+        #elif command == 'neg':
+        #    negv(stack.pop(),stack.pop());
+        #elif command == 'swap':
+        #    swappy();
+        elif command == 'show':
+            print(stack);
         elif command == 'quit':
-            #write to output file & stop interpreter
+            fout.write(stack);
 
     fin.close();
     fout.close();
