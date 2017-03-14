@@ -8,71 +8,84 @@ def is_digit(n):
         return  False
 
 
-def interpreter(infil, outfil):
-    fin = open(infil, 'r');
-    fout = open(outfil, 'w');
+def interpreter():#infil, outfil):
+    fin = open('/home/anandi/Desktop/cse305interpreter/src_interpreter/in.txt', 'r');
+    fout = open('/home/anandi/Desktop/cse305interpreter/src_interpreter/out.txt', 'w');
 
-'''
-def numbers_to_strings(argument):
-    switcher = {
-        0: "zero",
-        1: "one",
-        2: "two",
-    }
-    return switcher.get(argument, "nothing")
-'''
-
-    global stack = [];
-    global length = len(stack);
+    stack = [];
+    length = len(stack);
 
     for line in fin:
-        command = line.split(' ')[0];
-        num = line.split(' ')[1];
+        command = line;
 
-        if command == 'push':
+        if 'push' in command:
+            num = line.split(' ')[1];
             if is_digit(num):
                 stack.append(num);
             elif '"' in num:
-                stack.append(num[1:len(num)-1]);
-            elif num.isalphanum():
+                num = num.replace('"', '')
+                stack.append(num);
+            elif num.isalnum(): #not working for names
                 stack.append(num);
             else:
                 stack.append(':error:');
-        elif command == 'pop':
-            if length!=0:
+        elif 'pop' in command:
+            if len(stack)!=0:
                 stack.pop();
             else:
                 stack.append(':error');
-        elif command == ':true:':
+        elif ':true:' in command:
             stack.append(':true:');
-        elif command == ':false:':
+        elif ':false:' in command:
             stack.append(':false:');
-        elif command == ':error:':
+        elif ':error:' in command:
             stack.append(':error:');
-        elif command == 'add':
-            if length!=0 and length!=1 and stack[length-1].isdigit() and stack[length-2].isdigit():
-                stack.append(int(stack.pop()) + int(stack.pop()));
+        elif 'add' in command:
+            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]):
+                stack.append(str( int(stack.pop()) + int(stack.pop()) ) + '\n');
             else:
-                stack.append(':error:');
-        elif command == 'sub':
-            if length!=0 and length!=1 and stack[length-1].isdigit() and stack[length-2].isdigit():
-                stack.append(-int(stack.pop()) + int(stack.pop()));
+                stack.append(':error:\n');
+        elif 'sub' in command:
+            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]):
+                stack.append(str( -int(stack.pop()) + int(stack.pop()) ) + '\n');
             else:
-                stack.append(':error:');
-        #elif command == 'mul':
-        #    mult(stack.pop(),stack.pop());
-        #elif command == 'div':
-        #    divs(stack.pop(),stack.pop());
-        #elif command == 'rem':
-        #    remn(stack.pop(),stack.pop());
-        #elif command == 'neg':
-        #    negv(stack.pop(),stack.pop());
-        #elif command == 'swap':
-        #    swappy();
-        elif command == 'show':
-            print(stack);
-        elif command == 'quit':
-            fout.write(stack);
+                stack.append(':error:\n');
+        elif 'mul' in command:
+            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]):
+                stack.append(str( int(stack.pop()) * int(stack.pop()) ) + '\n');
+            else:
+                stack.append(':error:\n');
+        elif 'div' in command:
+            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]) and stack[len(stack)-1]!=0:
+                op2 = stack.pop();
+                op1 = stack.pop();
+                stack.append(str( int(int(op1) / int(op2)) ) + '\n');
+            else:
+                stack.append(':error:\n');
+        elif 'rem' in command:
+            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]) and stack[len(stack)-1]!=0:
+                op2 = stack.pop();
+                op1 = stack.pop();
+                stack.append(str( int(int(op1) % int(op2)) ) + '\n');
+            else:
+                stack.append(':error:\n');
+        elif 'neg' in command:
+            if len(stack)!=0 and is_digit(stack[len(stack)-1]):
+                stack.append(str( -int(stack.pop()) ) + '\n');
+            else:
+                stack.append(':error:\n');
+        elif 'swap' in command:
+            if len(stack)!=0 and len(stack)!=1:
+                op1 = stack.pop();
+                op2 = stack.pop();
+                stack.append(op1);
+                stack.append(op2);
+            else:
+                stack.append(':error:\n');
+        elif 'quit' in command:
+            while (len(stack)!=0):
+                a = str(stack.pop());
+                fout.write(a);
 
     fin.close();
     fout.close();
