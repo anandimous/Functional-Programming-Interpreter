@@ -1,5 +1,9 @@
-push 5
-neg
-push 3
-swap
+push -0
+show
+push a6
+show
+push "batman"
+show
+add
+push 9
 quit

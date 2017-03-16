@@ -7,33 +7,34 @@ def is_digit(n):
     except ValueError:
         return  False
 
-
-def interpreter():#infil, outfil):
-    fin = open('/home/anandi/Desktop/cse305interpreter/src_interpreter/in.txt', 'r');
-    fout = open('/home/anandi/Desktop/cse305interpreter/src_interpreter/out.txt', 'w');
+def interpreter(infil, outfil):
+    fin = open(infil, 'r');
+    fout = open(outfil, 'w');
 
     stack = [];
-    length = len(stack);
+    global alpList;
 
-    for line in fin:
-        command = line;
+    for command in fin:
+        alpList = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         if 'push' in command:
-            num = line.split(' ')[1];
-            if is_digit(num):
-                stack.append(num);
-            elif '"' in num:
-                num = num.replace('"', '')
-                stack.append(num);
-            elif num.isalnum(): #not working for names
-                stack.append(num);
+            line = command.split(' ')[1];
+            if is_digit(line):
+                stack.append(line);
+            elif line[0] in alpList:
+                stack.append(line[0:len(line)-1] + '\n');
+            elif line[0] == '-':
+                stack.append("expected");
+            elif '"' in line:
+                line = line.replace('"', '')
+                stack.append(line);
             else:
-                stack.append(':error:');
+                stack.append(':error:\n');
         elif 'pop' in command:
             if len(stack)!=0:
                 stack.pop();
             else:
-                stack.append(':error');
+                stack.append(':error:\n');
         elif ':true:' in command:
             stack.append(':true:');
         elif ':false:' in command:
@@ -56,14 +57,14 @@ def interpreter():#infil, outfil):
             else:
                 stack.append(':error:\n');
         elif 'div' in command:
-            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]) and stack[len(stack)-1]!=0:
+            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]) and int(stack[len(stack)-1]) != 0:
                 op2 = stack.pop();
                 op1 = stack.pop();
                 stack.append(str( int(int(op1) / int(op2)) ) + '\n');
             else:
                 stack.append(':error:\n');
         elif 'rem' in command:
-            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]) and stack[len(stack)-1]!=0:
+            if len(stack)!=0 and len(stack)!=1 and is_digit(stack[len(stack)-2]) and is_digit(stack[len(stack)-1]) and int(stack[len(stack)-1]) != 0:
                 op2 = stack.pop();
                 op1 = stack.pop();
                 stack.append(str( int(int(op1) % int(op2)) ) + '\n');
@@ -82,6 +83,8 @@ def interpreter():#infil, outfil):
                 stack.append(op2);
             else:
                 stack.append(':error:\n');
+        elif 'show' in command:
+            print(stack);
         elif 'quit' in command:
             while (len(stack)!=0):
                 a = str(stack.pop());
