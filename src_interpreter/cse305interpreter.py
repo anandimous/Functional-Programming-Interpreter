@@ -7,11 +7,25 @@ def is_digit(n):
     except ValueError:
         return  False
 
+def is_name(m):
+    alphaList = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if m[0] in alphaList:
+        return True;
+    else:
+        return False;
+
+def has_name_val(l, val_dict):
+    if l in val_dict.keys():
+        return True;
+    else:
+        return False;
+
 def interpreter(infil, outfil):
     fin = open(infil, 'r');
     fout = open(outfil, 'w');
 
     stack = [];
+    nameval = {};
     global alpList;
 
     for command in fin:
@@ -132,6 +146,33 @@ def interpreter(infil, outfil):
                 stack.append(':error:\n');
         #elif TBD   TBD     TBD     TBD     TBD     TBD     #
 
+        elif 'bind' in command:
+            if len(stack)!=0 and len(stack)!=1 and is_name(stack[len(stack)-2]):
+                op1 = stack.pop();
+                if is_digit(op1) or op1==':true:' or op1==':false:' or op1==':unit:' or isinstance(op1, str) or (is_name(op1) and has_name_val(op1, nameval)):
+                    op2 = stack.pop();
+                    if is_name(op1) and has_name_val(op1, nameval):
+                        nameval[op2] = nameval[op1];
+                        stack.append(':unit:\n');
+                    else:
+                        nameval[op2] = op1;
+                        stack.append(':unit:\n');
+                else:
+                    stack.append(':error:\n');
+            else:
+                stack.append(':error:\n');
+        elif 'if' in command:
+            if len(stack)!=0 and len(stack)!=1 and len(stack)!=2 and (stack[len(stack)-3] == ':true:' or stack[len(stack)-3] == ':false:'):
+                op1 = stack.pop();
+                op2 = stack.pop();
+                op3 = stack.pop();
+                if op3 == ':true:':
+                    stack.append(op1);
+                else:
+                    stack.append(op2);
+            else:
+                stack.append(':error:\n');
+        #elif 'let' in command:
 
         elif 'quit' in command:
             while (len(stack)!=0):

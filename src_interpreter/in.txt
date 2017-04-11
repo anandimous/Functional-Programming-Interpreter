@@ -1,9 +1,18 @@
-push -0
+push 0
 show
 push a6
 show
 push "batman"
 show
+bind
+show
+push a6
+show
+push b6
+show
+bind
+show
 add
+show
 push 9
 quit
