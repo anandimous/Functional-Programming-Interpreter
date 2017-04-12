@@ -27,6 +27,7 @@ def interpreter(infil, outfil):
     stack = [];
     nameval = {};
     global alpList;
+    count_let = 0;
 
     for command in fin:
         alpList = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -172,8 +173,10 @@ def interpreter(infil, outfil):
                     stack.append(op2);
             else:
                 stack.append(':error:\n');
-        #elif 'let' in command:
-
+        elif 'let' in command:
+            let_stack = [];
+            stack.append(let_stack);
+            count_let++;
         elif 'quit' in command:
             while (len(stack)!=0):
                 a = str(stack.pop());
