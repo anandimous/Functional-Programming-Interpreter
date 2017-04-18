@@ -9,7 +9,7 @@ fun namestr xs =
   let
       val isname = explode xs
   in
-      if Char.isAplha(hd (isname)) = true then true
+      if Char.isAlpha(hd (isname)) = true then true
       else
         false
   end

@@ -1,5 +1,5 @@
 pop
-push batman4
+push 10
 swap
 push 6
 add
