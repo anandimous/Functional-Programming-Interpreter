@@ -1,0 +1,21 @@
+push a
+:true:
+bind
+let
+push b
+:false:
+bind
+end
+let
+push b
+not
+push b
+push a
+push 18
+if
+end
+push b
+push a
+push 18
+if
+quit

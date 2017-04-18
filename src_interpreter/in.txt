@@ -1,18 +1,11 @@
-push 0
-show
-push a6
-show
-push "batman"
-show
-bind
-show
-push a6
-show
-push b6
-show
-bind
-show
+pop
+push batman4
+swap
+push 6
 add
-show
-push 9
+pop
+push -20
+mul
+push 5
+swap
 quit

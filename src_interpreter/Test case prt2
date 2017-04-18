@@ -1,0 +1,34 @@
+push 0
+show
+push a6
+show
+push "batman"
+show
+bind
+show
+push a6
+show
+push b6
+show
+bind
+let
+show
+push 1
+show
+push a3
+show
+push 7
+show
+bind
+show
+end
+show
+push a3
+show
+push 7
+show
+div
+show
+push 9
+quit
+
