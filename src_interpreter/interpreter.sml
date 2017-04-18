@@ -1,5 +1,3 @@
-open String;
-
 datatype Types =  INT of int | STR of string | NAME of string | ADD of Types*Types | SUB of Types*Types | MUL of Types*Types | DIV of Types*Types | REM of Types*Types;
 
 fun numstr xs = List.all (Char.isDigit) (explode xs)
@@ -14,78 +12,84 @@ fun namestr xs =
         false
   end
 
-fun eval (INT num) = INT num
-  | eval (STR str) = STR str
-  | eval (ADD (e1, e2)) =
+fun typedef (INT num) = INT num
+  | typedef (STR str) = STR str
+  | typedef (NAME name) = NAME name
+
+fun compute (ADD (inp1, inp2)) =
     let
-        val INT n1 = eval e1
-        val INT n2 = eval e2
+        val INT num1 = typedef inp1
+        val INT num2 = typedef inp2
     in
-        INT (n1+n2)
+        INT (num1+num2)
     end
-  | eval (MUL (e1, e2)) =
+   | compute (SUB (inp1, inp2)) =
     let
-        val INT n1 = eval e1
-        val INT n2 = eval e2
+    	val INT num1 = typedef inp1
+    	val INT num2 = typedef inp2
     in
-        INT (n1*n2)
+    	INT(num1-num2)
     end
-   | eval (SUB (e1, e2)) =
+    | compute (MUL (inp1, inp2)) =
     let
-    	val INT n1 = eval e1
-    	val INT n2 = eval e2
+      val INT num1 = typedef inp1
+      val INT num2 = typedef inp2
     in
-    	INT(n1-n2)
+      INT (num1*num2)
     end
-    | eval (DIV (e1,e2)) =
+    | compute (DIV (inp1,inp2)) =
     let
-    	val INT n1 = eval e1
-    	val INT n2 = eval e2
+    	val INT num1 = typedef inp1
+    	val INT num2 = typedef inp2
     in
-    	INT(n1 div n2)
+    	INT(num1 div num2)
     end
-    | eval (REM (e1,e2)) =
+    | compute (REM (inp1,inp2)) =
     let
-    	val INT n1 = eval e1
-    	val INT n2 = eval e2
+    	val INT num1 = typedef inp1
+    	val INT num2 = typedef inp2
     in
-    	INT(n1 mod n2)
+    	INT(num1 mod num2)
     end
 
-fun readlist (infile : string) =
+fun parseList (infile : string) =
 let
-	val ins = TextIO.openIn infile
-  	fun loop ins =
-   		case TextIO.inputLine ins of
-      			SOME line => line :: loop ins
+	val infil = TextIO.openIn infile
+  	fun list_app infil =
+   		case TextIO.inputLine infil of
+      			SOME line => line :: list_app infil
     			| NONE      => []
 in
-	loop ins before TextIO.closeIn ins
+	list_app infil before TextIO.closeIn infil
 end
 
-fun process ([], stack : Types list) = stack | process (s::lines , stack : Types list) =
-	if isSubstring ":error:" s then process(lines, STR(":error:")::stack)
-	else if isSubstring ":true:" s then process(lines, STR(":true:")::stack)
-	else if isSubstring ":false:" s then process(lines, STR(":false:")::stack)
-	else if isSubstring "push" s then
+fun process ([], stack : Types list) = stack | process (in_str::lines , stack : Types list) =
+	if String.isSubstring ":error:" in_str then process(lines, STR(":error:")::stack)
+	else if String.isSubstring ":true:" in_str then process(lines, STR(":true:")::stack)
+	else if String.isSubstring ":false:" in_str then process(lines, STR(":false:")::stack)
+	else if String.isSubstring "push" in_str then
 		let
-			val len = size s
-			val y = substring(s, 5, len - 6)
+			val len = size in_str
+			val y = substring(in_str, 5, len - 6)
+      val len_y = size y
+      val sub_y = substring(y, 1, len_y - 1)
 		in
-      if isSubstring "." y then process(lines, STR(":error:")::stack)
+      if String.isSubstring "." y then process(lines, STR(":error:")::stack)
       else
-        if numstr y = true orelse isSubstring "-" y then
-            let
-              val SOME x = Int.fromString(y)
-            in
-              process(lines, INT(x)::stack)
-            end
+        if String.isSubstring "-" y andalso numstr sub_y = false then process(lines, STR(":error:")::stack)
         else
-          if namestr y = true then process(lines, NAME(y)::stack)
+          if numstr y = true orelse String.isSubstring "-" y then
+              let
+                val SOME x = Int.fromString(y)
+              in
+                process(lines, INT(x)::stack)
+              end
           else
-            process(lines, STR(y)::stack)
+            if namestr y = true then process(lines, NAME(y)::stack)
+            else
+              process(lines, STR(y)::stack)
 		end
-	else if isSubstring "pop" s then
+	else if String.isSubstring "pop" in_str then
 		let
 			val len = length stack
 		in
@@ -97,7 +101,7 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
 					process(lines, restOfStack)
 				end
 		end
-	else if isSubstring "add" s then
+	else if String.isSubstring "add" in_str then
 		let
 			val len = length(stack)
 		in
@@ -108,11 +112,11 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
 					val y = hd (tl (stack))
 				in
 					case (x,y) of
-    						(INT x, INT y) => process(lines, eval(ADD(INT(x),INT(y)))::(tl (tl stack)))
+    						(INT x, INT y) => process(lines, compute(ADD(INT(x),INT(y)))::(tl (tl stack)))
     						| (_, _) => process(lines, STR(":error:")::stack)
 				end
 		end
-	else if isSubstring "sub" s then
+	else if String.isSubstring "sub" in_str then
 		let
 			val len = length(stack)
 		in
@@ -123,11 +127,11 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
 					val x = hd (tl (stack))
 				in
 					case (x,y) of
-    						(INT x, INT y) => process(lines, eval(SUB(INT(x),INT(y)))::(tl (tl stack)))
+    						(INT x, INT y) => process(lines, compute(SUB(INT(x),INT(y)))::(tl (tl stack)))
     						| (_, _) => process(lines, STR(":error:")::stack)
 				end
 		end
-	else if isSubstring "neg" s then
+	else if String.isSubstring "neg" in_str then
 		let
 			val len = length(stack)
 		in
@@ -137,11 +141,11 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
 					val x = hd (stack)
 				in
 					case x of
-    						INT x => process(lines, eval(MUL(INT(x),INT(~1)))::tl(stack))
+    						INT x => process(lines, compute(MUL(INT(x),INT(~1)))::tl(stack))
     						| _ => process(lines, STR(":error:")::stack)
 				end
 		end
-	else if isSubstring "mul" s then
+	else if String.isSubstring "mul" in_str then
 		let
 			val len = length(stack)
 		in
@@ -152,11 +156,11 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
 					val y = hd (tl (stack))
 				in
 					case (x,y) of
-    						(INT x, INT y) => process(lines, eval(MUL(INT(x),INT(y)))::(tl (tl stack)))
+    						(INT x, INT y) => process(lines, compute(MUL(INT(x),INT(y)))::(tl (tl stack)))
     						| (_, _) => process(lines, STR(":error:")::stack)
 				end
 		end
-	else if isSubstring "div" s then
+	else if String.isSubstring "div" in_str then
 		let
 			val len = length(stack)
 		in
@@ -169,11 +173,11 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
 					case (x,y) of
     						(INT x, INT y) =>
     						if (y = 0) then process(lines, STR(":error:")::stack)
-    						else process(lines, eval(DIV(INT(x),INT(y)))::(tl (tl stack)))
+    						else process(lines, compute(DIV(INT(x),INT(y)))::(tl (tl stack)))
     						| (_, _) => process(lines, STR(":error:")::stack)
 				end
 		end
-	else if isSubstring "rem" s then
+	else if String.isSubstring "rem" in_str then
 		let
 			val len = length(stack)
 		in
@@ -186,11 +190,11 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
 					case (x,y) of
     						(INT x, INT y) =>
     						if (y = 0) then process(lines, STR(":error:")::stack)
-    						else process(lines, eval(REM(INT(x),INT(y)))::(tl (tl stack)))
+    						else process(lines, compute(REM(INT(x),INT(y)))::(tl (tl stack)))
     						| (_, _) => process(lines, STR(":error:")::stack)
 				end
 		end
-	else if isSubstring "swap" s then
+	else if String.isSubstring "swap" in_str then
 		let
 			val len = length(stack)
 		in
@@ -212,29 +216,29 @@ fun process ([], stack : Types list) = stack | process (s::lines , stack : Types
     						| (STR x, STR y) => process(lines, STR(y)::STR(x)::(tl (tl stack)))
 				end
 		end
-	else if isSubstring "quit" s then
+	else if String.isSubstring "quit" in_str then
 		process([], stack)
 	else stack
 
-fun removeTilde(inp:string) =
-	if isSubstring "~" inp then ("-" ^ substring(inp, 1, size(inp) - 1)) else inp
+fun rmTilde(input : string) =
+	if String.isSubstring "~" input then ("-" ^ substring(input, 1, size(input) - 1)) else input
 
-fun hw2(infile:string, outFile:string) =
+fun interpreter(infil : string, outfil : string) =
 	let
-		val inp = readlist(infile)
-		val stack = process(inp, [])
-		val outStream = TextIO.openOut outFile
+		val in_list = parseList(infil)
+		val stack = process(in_list, [])
+		val outStream = TextIO.openOut outfil
 		fun helper([]) = (TextIO.closeOut outStream)
-			| helper(a::newStack) =
-			case a of
-				INT a => (TextIO.output(outStream, removeTilde(Int.toString(a)) ^ "\n");
-				helper(newStack))
-				| STR a => (TextIO.output(outStream, a ^ "\n");
-				helper(newStack))
-        | NAME a => (TextIO.output(outStream, a ^ "\n");
-				helper(newStack))
+			| helper(a::oStack) =
+    			case a of
+    				INT a => (TextIO.output(outStream, rmTilde(Int.toString(a)) ^ "\n");
+    				helper(oStack))
+    				| STR a => (TextIO.output(outStream, a ^ "\n");
+    				helper(oStack))
+            | NAME a => (TextIO.output(outStream, a ^ "\n");
+    				helper(oStack))
 	in
 		helper(stack)
 	end
 
-val _ = hw2("/home/anandi/Desktop/cse305interpreter/src_interpreter/in.txt","/home/anandi/Desktop/cse305interpreter/src_interpreter/out.txt")
+(*val _ = interpreter("/home/anandi/Desktop/cse305interpreter/src_interpreter/in.txt","/home/anandi/Desktop/cse305interpreter/src_interpreter/out.txt");*)
