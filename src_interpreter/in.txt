@@ -1,4 +1,5 @@
-push -5
-push -47
-push -x
+:true:
+push 8
+push a9
+if
 quit
