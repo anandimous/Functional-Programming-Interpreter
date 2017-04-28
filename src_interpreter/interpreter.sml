@@ -124,12 +124,12 @@ fun process ([], stack : Types list) = stack | process (in_str::lines , stack : 
 		let
 			val len = size in_str
 			val y = substring(in_str, 5, len - 6)
-      (*val len_y = size y
-      val sub_y = substring(y, 1, len_y - 1)*)
+      val len_y = size y
+      val sub_y = substring(y, 1, len_y - 1)
 		in
       if String.isSubstring "." y then process(lines, STR(":error:")::stack)
       else
-        if String.isSubstring "-" y andalso numstr y = false then process(lines, STR(":error:")::stack)
+        if String.isSubstring "-" y andalso numstr sub_y = false then process(lines, STR(":error:")::stack)
         else
           if numstr y = true orelse String.isSubstring "-" y then
               let
@@ -196,7 +196,7 @@ fun process ([], stack : Types list) = stack | process (in_str::lines , stack : 
 					val x = hd (stack)
 				in
 					case x of
-    						INT x => process(lines, compute(MUL(INT(x),INT(~1)))::(tl (tl stack)))
+    						INT x => process(lines, compute(MUL(INT(x),INT(~1)))::tl(stack))
     						| _ => process(lines, STR(":error:")::stack)
 				end
 		end
@@ -367,7 +367,7 @@ fun process ([], stack : Types list) = stack | process (in_str::lines , stack : 
                 | (BOOL x, INT y) => process(lines, INT(y)::BOOL(x)::(tl (tl stack)))
 				end
 		end
-  else if String.isSubstring "bind" in_str then
+  (*else if String.isSubstring "bind" in_str then*)
     (* TBD -------------------------------- TBD *)
 
     (* ಠ_ಠ *)

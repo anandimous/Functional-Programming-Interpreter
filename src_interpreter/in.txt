@@ -1,5 +1,16 @@
-:true:
-push 8
-push a9
-if
+push a
+bind
+bind
+let
+push b
+bind
+end
+pop
+pop
+pop
+push 10
+bind
+push a
+push a
+mul
 quit
