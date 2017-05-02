@@ -1,0 +1,31 @@
+push a
+push 9
+bind
+push a
+push 10
+bind
+push a
+push a
+add
+push a
+push "9!!"
+bind
+push a
+push 9
+mul
+push b
+push 5
+bind
+push c
+swap
+bind
+push d
+:true:
+bind
+push c
+push d
+bind
+push d
+push c
+and
+quit

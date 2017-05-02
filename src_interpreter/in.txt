@@ -1,16 +1,25 @@
-push a
-bind
-bind
-let
+fun expr1 b
 push b
+push b
+mul
+return
+funEnd
+fun expr2 a
+push c
+push 5
 bind
-end
-pop
-pop
-pop
-push 10
-bind
-push a
+push 4
 push a
 mul
+push c
+mul
+return
+funEnd
+push 7
+push expr1
+call
+push 2
+push expr2
+call
+sub
 quit

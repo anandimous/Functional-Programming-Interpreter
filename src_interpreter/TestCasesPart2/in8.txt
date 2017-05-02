@@ -1,0 +1,12 @@
+push a
+push 5
+bind
+push b
+push 10
+bind
+push a
+push b
+add
+push 3
+div
+quit

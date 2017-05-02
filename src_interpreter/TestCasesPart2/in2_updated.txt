@@ -1,0 +1,31 @@
+push a
+push 3
+bind
+push b
+push 5
+bind
+push IsUnit
+swap
+bind
+push a
+push b
+mul
+push 10
+lessThan
+push FALSEmaybe
+swap
+bind
+push FALSEmaybe
+:false:
+or
+push "FALSEmaybe is"
+push -WhatIsaUNIT?!
+push "Was there a name?"
+bind
+push IsUnit
+push -15
+bind
+pop
+push IsUnit
+neg
+quit

@@ -1,0 +1,8 @@
+push a
+push 7
+push 9
+equal
+push 10
+push 17
+lessThan
+quit

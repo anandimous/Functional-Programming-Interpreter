@@ -1,0 +1,7 @@
+:true:
+:false:
+and
+not
+:false:
+or
+quit

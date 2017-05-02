@@ -1,0 +1,5 @@
+:true:
+push 3
+and
+push 5
+quit

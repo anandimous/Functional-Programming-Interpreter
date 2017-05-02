@@ -1,0 +1,6 @@
+push a
+push 9
+bind
+push "a"
+push 3
+quit
